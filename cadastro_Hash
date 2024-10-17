@@ -1,0 +1,58 @@
+import hashlib
+import secrets
+
+def gerar_hash_senha(senha, salt):
+    return hashlib.sha512((salt + senha).encode()).hexdigest()
+
+def cadastrar_usuario(usuarios):
+    login = input("Digite o login do novo usuário: ")
+    senha = input("Digite a senha do novo usuário: ")
+    salt = secrets.token_hex(5)  # Gerando salt de 10 caracteres (5 bytes em hexadecimal)
+    senha_hash = gerar_hash_senha(senha, salt)
+    usuarios[login] = {'salt': salt, 'hash': senha_hash}
+    print("Usuário cadastrado com sucesso!\n")
+
+def listar_usuarios(usuarios):
+    if usuarios:
+        print("Lista de usuários cadastrados:")
+        for login, dados in usuarios.items():
+            print(f"Login: {login}, Salt: {dados['salt']}, Hash: {dados['hash']}")
+    else:
+        print("Nenhum usuário cadastrado.\n")
+
+def fazer_login(usuarios):
+    login = input("Digite seu login: ")
+    if login not in usuarios:
+        print("Login ou senha inválidos.\n")
+        return
+    senha = input("Digite sua senha: ")
+    salt = usuarios[login]['salt']
+    senha_hash = gerar_hash_senha(senha, salt)
+   
+    if senha_hash == usuarios[login]['hash']:
+        print("Login bem-sucedido!\n")
+    else:
+        print("Login ou senha inválidos.\n")
+
+def menu():
+    usuarios = {}
+    while True:
+        print("1. Cadastrar novo usuário")
+        print("2. Listar todos os usuários")
+        print("3. Fazer login")
+        print("4. Sair")
+        opcao = input("Escolha uma opção: ")
+       
+        if opcao == '1':
+            cadastrar_usuario(usuarios)
+        elif opcao == '2':
+            listar_usuarios(usuarios)
+        elif opcao == '3':
+            fazer_login(usuarios)
+        elif opcao == '4':
+            print("Saindo...")
+            break
+        else:
+            print("Opção inválida!\n")
+
+menu()
